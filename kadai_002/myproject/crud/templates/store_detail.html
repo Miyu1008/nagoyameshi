@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}店舗詳細{% endblock %}
+{% block content %}
+    <main>
+        <article>
+           <h1>店舗詳細</h1>
+           <body>
+            <h1>{{ store.name }}の詳細</h1>
+            <p>説明: {{ store.description }}</p>
+            <p>住所: {{ store.address }}</p>
+            <p>電話番号: {{ store.phone_number }}</p>
+            {% if store.image %}
+                <img src="{{ store.image.url }}" alt="{{ store.name }}" width="200">
+            {% else %}
+                <img src="{% static 'images/default_image.png' %}" alt="デフォルト画像" width="200">
+
+            {% endif %}
+            
+
+            <!-- 他の店舗情報も表示することができます -->
+        </body>
+        </article>
+    </main>
+{% endblock %}

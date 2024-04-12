@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+    <main>
+        <article>
+            <h1>ログイン</h1>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.username.label_tag }}
+                {{ form.username }}
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                <br>
+            <input type="submit" class="btn btn-primary" value="ログイン">
+            <div>
+                <input type="checkbox" id="horns" name="horns" /><p>次回から自動的にログインする</p>
+            </div>
+            <a href="{% url 'password_reset' %}">パスワードをお忘れの方はこちら</a>
+            <a href="{% url 'signUp' %}">新規会員登録はこちら</a>
+            </form>
+        </article>
+        
+    </main>
+    {% endblock %}

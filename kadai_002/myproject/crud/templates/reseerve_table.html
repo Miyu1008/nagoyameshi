@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+    <main>
+        <article>
+            <h1>店舗予約</h1>
+<form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="table_id" value="{{ table.id }}">
+    <input type="date" name="start_date">
+    <input type="date" name="end_date">
+    <input type="email" name="customer_email">
+    <button type="submit">予約する</button>
+</form>
