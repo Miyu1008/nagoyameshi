@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}店舗詳細{% endblock %}
+{% block content %}
+{% csrf_token %}
+    <main>
+        <article>
+           <h1>店舗詳細</h1>
+           <body>
+            <h1>{{ store.name }}の詳細</h1>
+            <p>説明: {{ store.description }}</p>
+            <p>住所: {{ store.address }}</p>
+            <p>電話番号: {{ store.phone_number }}</p>
+            {% if store.image %}
+            <img src="{{ store.image.url }}" alt="{{ store.name }}" width="200">
+            {% else %}
+            <img src="static/images/default_image.png" alt="デフォルト画像" width="200">
+            {% endif %}
+           
+            <a href="{% url 'calendar_init' store.id %}">予約する</a>
+            
+
+
+            {% if user.is_authenticated %}
+            <form method="post" action="{% url 'favorite' store.id %}">
+                {% csrf_token %}
+                <button type="submit">お気に入りに追加</button>
+            </form>
+            {% else %}
+            <p>お気に入りに追加するには <a href="{% url 'login' %}">ログイン</a>してください。</p>
+            {% endif %}
+                {% csrf_token %}
+            </form>
+           
+        </body>
+        </article>
+    </main>
+{% endblock %}

@@ -1,12 +1,12 @@
-from django import forms # Djangoのformsモジュールをインポート
+from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Store
-
+from accounts.models import CustomUser as User
 
 # SearchFormクラスを定義
 class SearchForm(forms.Form):
-        keyword = forms.CharField(label='', max_length=50)
+    keyword = forms.CharField(label='', max_length=50)
 
 class CustomUserCreationForm(UserCreationForm):
     # 必要なフィールドを追加
@@ -33,8 +33,26 @@ class CustomUserCreationForm(UserCreationForm):
         model = User
         fields = ('first_name', 'email', 'password1', 'password2',
                   'postal_code', 'address', 'phone_number', 'birthday')
-        
+
 class StoreForm(forms.ModelForm):
     class Meta:
         model = Store
         fields = ['name', 'description', 'address', 'phone_number', 'image']
+
+# 新規会員登録のフォームを追加
+class UserRegistrationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('email', 'password1', 'password2')
+
+class StoreRegistrationForm(UserCreationForm):
+    class Meta:
+        model = User
+        fields = ('email', 'password1', 'password2')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        user.is_store = True
+        if commit:
+            user.save()
+        return user

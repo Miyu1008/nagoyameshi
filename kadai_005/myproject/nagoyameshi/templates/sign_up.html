@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+<main>
+    <article>
+        <h1>新規会員登録</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Sign Up</button>
+        </form>
+    </article> 
+</main>
+{% endblock %}

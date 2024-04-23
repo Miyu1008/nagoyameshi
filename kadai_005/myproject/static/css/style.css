@@ -1,0 +1,97 @@
+/*PC,スマホ共通スタイル*/
+body{
+    font-family: "Source Sans Pro", "Hiragino Kaku Gothic ProN", Meiryo, Arial, sans-serif;
+};
+p {
+    font-size: 15px;
+  }
+
+/*PC用のスタイル*/
+
+/*横幅設定*/
+body{
+    max-width: 1080px;
+    min-width: 960px;
+    margin: 0 auto 0 auto;
+}
+
+/*ヘッダー*/
+header {
+    display: flex;
+    justify-content: space-between;
+
+}
+
+
+/*ナビゲーションのレイアウト*/
+#nav-pc {
+    font-size: 14px;
+    padding-top: 15px;
+}
+
+/*ナビゲーションリンクの装飾設定*/
+#nav-pc > a {
+    text-decoration: none;
+    margin-left: 20px;
+}
+#nav-pc > a:link {
+    color:black;
+}
+#nav-pc > a:visited {
+    color:black;
+}
+#nav-pc > a:hover {
+    color: black;
+    text-decoration: underline;
+}
+#nav-pc > a:active {
+    color:black;
+}
+
+/*メインビジュアル*/
+#main-visual{
+    position: relative;
+    height: 200px;
+}
+.top-main > img {
+    width: 100%;
+    height: auto;
+    max-width: 100%;
+    max-height: 400px;
+}
+#main-message > h1 {
+    position: absolute;
+    font-size: 30px;
+    font-family: serif;
+    margin: 50px 0 0 50px;
+    color: white;
+  }
+#main-message > p { 
+    position: absolute;
+    font-size: 20px;
+    margin: 100px 0 0 50px;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(255, 255, 255, 0.5);
+
+  }
+
+#textbox > form {
+    text-align: center;
+    margin-top: 230px;
+}
+
+
+li {
+    list-style: none;
+  }
+
+  ul {
+    list-style: none;
+  }
+
+  /* calendar */
+
+.calendar img {
+    height: 150px;
+    object-fit: contain;
+  }

@@ -1,0 +1,59 @@
+{% load static %}
+
+<!doctype html>
+<html lang="ja">
+
+
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="名古屋のB級グルメ専門のレビューサイトです。">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+    <body>
+ 
+   <!--ヘッダー-->
+  <header>
+  <!--ロゴ-->
+  <a href="{% url 'top' %}" id="logo"><img src="{% static 'images/logo.png' %}" alt="トップページ"></a>
+  <!--PC用ナビゲーション-->
+  {% if request.user.is_authenticated %}
+  <span class="navbar-text">ようこそ {{ user.get_username }} さん</span>
+  <!-- ユーザーの種類に基づいて異なるマイページへのリンクを表示 -->
+  {% if user.user_type == 1 %}
+  <a href="{% url 'user_dashboard' %}">マイページ</a>
+  {% elif user.user_type == 2 %}
+  <a href="{% url 'store_dashboard' store.id %}">マイページ</a>
+  {% endif %}
+  
+  <li class="nav-item" style="list-style-type: none;">
+  <form method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit" style="background: none!important; font-size: 16px; border: none; padding: 0!important; color: #069; text-decoration: underline; cursor: pointer;">ログアウト</button>
+  
+  </form>
+  </li> 
+
+  {% else %}
+  <nav id="nav-pc">
+  <a href="{% url 'login' %}">ログイン</a>
+  <a href="{% url 'sign_up' %}">新規登録</a>
+  </nav>
+  {% endif %}
+  </header>
+
+
+    {% block content %}{% endblock %}
+  
+
+     <footer>
+      <div id="footer-logo">
+        <a href="{% url 'top' %}" id="logo"><img src="{% static 'images/logo.png' %}" alt="トップページ"></a>
+        <a href="{% url 'companyoverview' %}">会社概要</a>
+        <a href="{% url 'membershipterms' %}">会員規約</a>
+        <span id="copyright">&copy;NAGOYAMESHI All rights reserved. </span>
+      </div>
+     </footer>
+    </body>
+
+</html>

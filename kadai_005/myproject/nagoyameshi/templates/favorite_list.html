@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+<h1>お気に入り一覧</h1>
+<ul>
+    {% for favorite in favorites %}
+        <li>{{ favorite.store.name }}</li>  <!-- お気に入りのストアの名前を表示 -->
+    {% endfor %}
+</ul>

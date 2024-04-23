@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+
+
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+    <main>
+        <article>
+            <!--メインビジュアル-->
+            <section id="main-visual">
+                <div id="main-message">
+                    <h1 class="main-heading">名古屋の味を楽しむ</h1>
+                    <p class="site-description">名古屋市のB級グルメ専門のレビューサイトです。</p>
+                </div>
+                <div class="top-main"><img src="static/images/top-main.png" alt="ひつまぶし" ></div>
+
+            </section>
+        </article>
+        <article>
+            <!--検索フォーム-->
+        <div id="textbox">
+            <form method="get" action="{% url 'store_list' %}"><!--あとでなおす-->
+            <input type="text" name="q" placeholder="">
+            <input type="submit" class="btn btn-primary" value="検索">
+        </form>
+        </div>
+        
+        </article>
+        
+    </main>
+    {% endblock %}
+

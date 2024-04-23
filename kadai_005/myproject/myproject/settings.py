@@ -9,10 +9,9 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-# settings.py
-import os
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -22,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(7gkw%b)d0=8=yc^hscdyz^5k)51+qwpscqe=ar5vgdy!e-g%w'
+SECRET_KEY = 'django-insecure-+2vf0az6_th$ax7c1i!e+6#(qanx1k7m)$o-2xz=@g@(_qptpl'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -39,9 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'crud',
-    'accounts',
-
+    'nagoyameshi',
 ]
 
 MIDDLEWARE = [
@@ -67,6 +64,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
             ],
         },
     },
@@ -105,7 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
@@ -118,39 +115,30 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.0/howto/static-files/
-
-STATIC_URL = '/static/'
-STATICFILES_DIRS=[
-    os.path.join(BASE_DIR, 'static'),
-]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+#画像設定
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/5.0/howto/static-files/
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS =[
+os.path.join(BASE_DIR, 'static')
+]
+MEDIA_URL = '/images/'
+
+
+
 # ログイン認証
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'top'
 LOGOUT_REDIRECT_URL = 'top'
 
-#メール設定
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'gmailアカウント名'
-EMAIL_HOST_PASSWORD = 'パスワード'
-EMAIL_USE_TLS = True
+AUTH_USER_MODEL = 'nagoyameshi.CustomUser'
 
-#画像設定
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-#カスタムユーザー
-AUTH_USER_MODEL = 'accounts.CustomUser'
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',  # Djangoのデフォルトの認証バックエンド
-    'myapp.backends.EmailBackend',  # 追加したカスタム認証バックエンド
-]

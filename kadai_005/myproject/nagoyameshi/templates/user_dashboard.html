@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+<h1>マイページ</h1>
+<a href="{% url 'favorite_list' %}">お気に入り</a>
+
+{% endblock %}

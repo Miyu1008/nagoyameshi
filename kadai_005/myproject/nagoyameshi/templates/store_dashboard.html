@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}NAGOYAMESHI{% endblock %}
+{% block content %}
+{% csrf_token %}
+<h1>店舗マイページ</h1>
+<a href="{% url 'new' %}">新規作成</a>
+<a href="{% url 'new' %}">店舗管理</a>
+<a href="{% url 'new' %}">レビュー管理</a>
+<a href="{% url 'new' %}">カテゴリ管理</a>
+<a href="{% url 'new' %}">会員情報</a>
+<a href="{% url 'new' %}">売上集計</a>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <br>
+    <input type="submit" class="btn btn-primary" value="登録">
+</form>
+
+<h2>店舗情報の編集</h2>
+<form method="POST" class="post-form">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="save btn btn-default">保存</button>
+</form>
+
+{% endblock %}
