@@ -1,0 +1,62 @@
+
+<!DOCTYPE html>
+<html>
+    <meta name="csrf-token" content="{{ csrf_token }}"> 
+<head>
+   <title>商品購入</title>
+   <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+   <script src="https://js.stripe.com/v3/"></script>
+ </head>
+
+ <body>
+
+
+   <section>
+     <div class="product">
+       <div class="description">
+         <h3>有料会員に登録する</h3>
+         <h5>300円</h5>
+       </div>
+     </div>
+     <button type="button" id="checkout-button">Checkout</button>
+   </section>
+ </body>
+ <script type="text/javascript">
+   // Create an instance of the Stripe object with your publishable API key
+   var stripe = Stripe("pk_test_51PE2jMHP6OevB5tXl9LjkPeuaSP2mhk5GluFymGoDr6H8PUVOfkdZmm4ZHr4Pdh7g01Na7k19DqYtBxlr5o7Wb0b007NHNGTUD");
+   var checkoutButton = document.getElementById("checkout-button");
+   var csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+
+   checkoutButton.addEventListener("click", function () {
+    fetch("/create_checkout_session/", {
+  method: "POST",
+  headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json; charset=UTF-8',
+      'X-CSRFToken': csrfToken
+  },
+
+     })
+       .then(function (response) {
+
+         return response.json();
+       })
+       .then(function (session) {
+         return stripe.redirectToCheckout({ sessionId: session.id });
+       })
+       .then(function (result) {
+         // If redirectToCheckout fails due to a browser or network
+         // error, you should display the localized error message to your
+         // customer using error.message.
+         if (result.error) {
+           alert(result.error.message);
+         }
+       })
+       .catch(function (error) {
+         console.error("Error:", error);
+       });
+   });
+ </script>
+</html>
+

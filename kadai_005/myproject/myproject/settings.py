@@ -39,6 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'nagoyameshi',
+    'subscription',
+
+
 ]
 
 MIDDLEWARE = [
@@ -140,5 +143,6 @@ LOGOUT_REDIRECT_URL = 'top'
 
 AUTH_USER_MODEL = 'nagoyameshi.CustomUser'
 
-
+STRIPE_PUBLIC_KEY = 'pk_test_51PE2jMHP6OevB5tXl9LjkPeuaSP2mhk5GluFymGoDr6H8PUVOfkdZmm4ZHr4Pdh7g01Na7k19DqYtBxlr5o7Wb0b007NHNGTUD'
+STRIPE_SECRET_KEY = 'sk_test_51PE2jMHP6OevB5tXixpSyyGcHX5g4MOh0GeH0AA8qpw3fScMXHilR0knoZxlp2fnSchyRxLDK9gOh1qL8LJfyBnA00Jnk6QzUu'
 

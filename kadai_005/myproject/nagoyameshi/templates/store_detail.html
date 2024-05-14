@@ -17,21 +17,26 @@
             <img src="static/images/default_image.png" alt="デフォルト画像" width="200">
             {% endif %}
            
-            <a href="{% url 'calendar_init' store.id %}">予約する</a>
-            
-
+            <a href="{% url 'booking' store.id %}">予約する</a>
 
             {% if user.is_authenticated %}
-            <form method="post" action="{% url 'favorite' store.id %}">
+            <!-- お気に入り追加/解除ボタン -->
+            <form method="post" action="{% url 'toggle_favorite' store.id %}">
                 {% csrf_token %}
-                <button type="submit">お気に入りに追加</button>
+                <button type="submit">
+                    {% if favorite %}
+                    お気に入りから削除
+                    {% else %}
+                    お気に入りに追加
+                    {% endif %}
+                </button>
             </form>
             {% else %}
             <p>お気に入りに追加するには <a href="{% url 'login' %}">ログイン</a>してください。</p>
             {% endif %}
-                {% csrf_token %}
-            </form>
-           
+            {% for msg in messages %}
+            <p class="{{ msg.tags }}">{{ msg }}</p>
+            {% endfor %}
         </body>
         </article>
     </main>

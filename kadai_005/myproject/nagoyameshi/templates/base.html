@@ -23,7 +23,7 @@
   {% if user.user_type == 1 %}
   <a href="{% url 'user_dashboard' %}">マイページ</a>
   {% elif user.user_type == 2 %}
-  <a href="{% url 'store_dashboard' store.id %}">マイページ</a>
+  <a href="{% url 'store_dashboard' %}">マイページ</a>
   {% endif %}
   
   <li class="nav-item" style="list-style-type: none;">

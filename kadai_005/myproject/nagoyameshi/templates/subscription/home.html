@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block main %}
+<h2>サブスクページ</h2>
+<p>{{ user }}さん、こんにちは！</p>
+
+<script src="https://js.stripe.com/v3/"></script>  <!-- new -->
+<script src="{% static "main.js" %}"></script> <!-- new -->
+
+<div class="container mt-5">
+    <button type="submit" class="btn btn-primary" id="submitBtn">特別会員になる</button>
+  </div>
+{% endblock %}

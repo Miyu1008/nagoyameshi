@@ -1,8 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
-<h1>お気に入り一覧</h1>
+{% block title %}店舗詳細{% endblock %}
+{% block content %}
+
+<main>
+<article>
+    <h1>お気に入り一覧</h1>
 <ul>
     {% for favorite in favorites %}
-        <li>{{ favorite.store.name }}</li>  <!-- お気に入りのストアの名前を表示 -->
+        <li><a href="{% url 'store_detail' favorite.store.id %}">{{ favorite.store }}</a></li>
+
     {% endfor %}
 </ul>
+</article>
+</main>
+{% endblock %}

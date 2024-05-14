@@ -7,8 +7,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from datetime import date
 
-
-#ユーザー
+# ユーザー
 class CustomUserManager(BaseUserManager):
     
     def create_user(self, email, password=None, **extra_fields):
@@ -19,9 +18,9 @@ class CustomUserManager(BaseUserManager):
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
-        return user
         user_type = models.CharField(max_length=30, default='default_value')
-
+        return user
+        
 
     def create_superuser(self, email, password=None, **extra_fields):
         extra_fields.setdefault('is_staff', True)
@@ -38,7 +37,6 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     user_type = models.PositiveSmallIntegerField(choices=USER_TYPE_CHOICES, default=1)
     
-    email = models.EmailField('メールアドレス', unique=True)
     first_name = models.CharField(('姓'), max_length=30)
     last_name = models.CharField(('名'), max_length=30)
     description = models.TextField('自己紹介', default="", blank=True)
@@ -56,16 +54,21 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
+# 店舗の定休日
+class StoreDayOff(models.Model):
+    store = models.ForeignKey('Store', related_name='storeday_offs', on_delete=models.CASCADE)
+    day_off = models.ForeignKey('DayOff', on_delete=models.CASCADE)
 
-
-#店舗
+    def __str__(self):
+        return f"{self.store.name} - {self.day_off.date}"
+# 店舗
 class Store(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField()
     address = models.CharField(max_length=200, default='Tokyo, Japan', blank=True) 
     phone_number = models.CharField(max_length=20, default='')
+    unavailable_dates = models.ManyToManyField('Date', blank=True, related_name='unavailable_stores')
     image = models.ImageField(upload_to='static/images/', default='static/images/default_image.png')
-    available_dates = models.ManyToManyField('Date', blank=True)
 
     def __str__(self):
         return self.name    
@@ -73,9 +76,14 @@ class Store(models.Model):
 class Date(models.Model):
     date = models.DateField()
 
+class DayOff(models.Model):
+    name = models.CharField(max_length=200)
+    date = models.DateField()
 
-
-#店舗予約
+    def __str__(self):
+        return self.name
+    
+# 店舗予約
 class Schedule(models.Model):
     """予約スケジュール."""
     start = models.DateTimeField('開始時間')
@@ -87,10 +95,6 @@ class Schedule(models.Model):
         end = timezone.localtime(self.end).strftime('%Y/%m/%d %H:%M:%S')
         return f'{self.name} {start} ~ {end} {self.staff}'
     
-
-
-
-
 class Product(models.Model):
     name = models.CharField(max_length=200)
     price = models.PositiveIntegerField()
@@ -101,11 +105,7 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('list')
     
-
-
-
 class Booking(models.Model):
-    #staff = models.ForeignKey(Staff, verbose_name='スタッフ', on_delete=models.CASCADE)
     first_name = models.CharField('姓', max_length=100, null=True, blank=True)
     last_name = models.CharField('名', max_length=100, null=True, blank=True)
     tel = models.CharField('電話番号', max_length=100, null=True, blank=True)
@@ -118,11 +118,39 @@ class Booking(models.Model):
         end = timezone.localtime(self.end).strftime('%Y/%m/%d %H:%M')
         return f'{self.first_name}{self.last_name} {start} ~ {end} {self.staff}'
 
-#お気に入り
+# お気に入り
 class Favorite(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    store = models.ForeignKey(Store, on_delete=models.CASCADE)  # Store モデルに適切な名前で修正する
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('user', 'store')  # ユーザーごとに同じ店舗を複数回お気に入りに登録できないように設定
+
+SCORE_CHOICES = [
+    (1, '★'),
+    (2, '★★'),
+    (3, '★★★'),
+    (4, '★★★★'),
+    (5, '★★★★★'),
+]
+
+class Review(models.Model):
+    shop_id = models.CharField('店舗ID', max_length=10, blank=False)
+    shop_name = models.CharField('店舗名', max_length=200, blank=False)
+    image_url = models.CharField('画像１URL', max_length=300, blank=True)
+    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    comment = models.TextField(verbose_name='レビューコメント', blank=False)
+    score = models.PositiveSmallIntegerField(verbose_name='レビュースコア', choices=SCORE_CHOICES, default='3')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ('user', 'store') 
+
+    def __str__(self):
+        return str(self.shop_id)
+
+    def get_percent(self):
+        percent = round(self.score / 5 * 100)
+        return percent

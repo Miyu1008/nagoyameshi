@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
-{% load widget_tweaks %}
 {% block content %}
-
 {% csrf_token %}
 <div class="card card-booking my-5 mx-auto">
   <div class="card-body">
@@ -10,15 +8,10 @@
     <table class="booking_table mb-4">
       <tbody>
         <tr>
-          <th class="header">店舗</th>
           <td class="data">{{ store.name }}店</td>
         </tr>
         <tr>
-          <th class="header">日程</th>
-          <td class="data">
-            {% for error in form.non_field_errors %}
-            <h5 class="text-danger">{{ error|linebreaksbr }}</h5>
-            {% endfor %} {{ year }}年{{ month }}月{{ day }}日 {{ hour }}:00
+
           </td>
         </tr>
       </tbody>
@@ -29,22 +22,9 @@
       <table class="booking_table mb-4">
         <tbody>
           <tr>
-            <th class="header">お名前</th>
-            <td class="data form_wrap form_wrap__2col">
-              {% render_field form.first_name class="form-control" placeholder="姓" %}
-              {% render_field form.last_name class="form-control" placeholder="名" %}
-            </td>
-          </tr>
-          <tr>
-            <th class="header">電話番号</th>
-            <td class="data">
-              {% render_field form.tel class="form-control" placeholder="080-1234-5678" %}
-            </td>
-          </tr>
-          <tr>
-            <th class="header">その他備考</th>
-            <td class="data">
-              {% render_field form.remarks class="form-control" %}
+            {{ form.as_p }}
+ 
+
             </td>
           </tr>
         </tbody>

@@ -1,3 +1,4 @@
+
 {% extends "base.html" %}
 {% load static %}
 {% block title %}予約カレンダー{% endblock %}
@@ -5,159 +6,85 @@
 {% csrf_token %}
 <div class="text-center my-5">
     <div class="row">
-      <div class="col-md-6 mb-4 text-center calendar">
-        <!--<img src="{{ staff_data.user.image.url }}" class="img-fluid" alt="" />-->
-      </div>
-  
-      <div class="col-md-6 mb-5">
-        <div class="card">
-          <div class="card-body px-2 py-1">
-            <div class="p-4 text-left">
-              <h3>
-                <!--{{ staff_data.user.first_name }} {{ staff_data.user.last_name }}-->
-              </h3>
-              <hr />
-              <p>店舗：{{ store.name }}店</p>
-              <!--<p>{{ staff_data.user.description|linebreaksbr }}</p>-->
-            </div>
-          </div>
+        <div class="col-md-6 mb-4 text-center calendar">
         </div>
-      </div>
+
+        <div class="col-md-6 mb-5">
+            <div class="card">
+                <div class="card-body px-2 py-1">
+                    <div class="p-4 text-left">
+                        <h3>
+                        </h3>
+                        <hr />
+                        <p>店舗：{{ store.name }}店</p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-  
+
     <div class="mb-3">
-      <h1>予約カレンダー</h1>
-      <p>{{ start_day }}～{{ end_day }}</p>
+        <h1>予約カレンダー</h1>
+        <p>{{ start_day }}～{{ end_day }}</p>
     </div>
-  
+
     <div class="d-flex mb-2">
-      <div class="mx-3 mr-auto">
-        <a
-          class="btn btn-warning"
-          href="{% url 'calendar' store.id before.year before.month before.day %}"
-          >前週</a
-        >
-      </div>
-      <div class="mx-3">
-        <a
-          class="btn btn-warning"
-          href="{% url 'calendar' store.id next.year next.month next.day %}"
-          >次週</a
-        >
-      </div>
+        <div class="mx-3 mr-auto">
+            <a class="btn btn-warning"
+                href="{% url 'calendar' store.id before.year before.month before.day %}">前週</a>
+        </div>
+        <div class="mx-3">
+            <a class="btn btn-warning"
+                href="{% url 'calendar' store.id next.year next.month next.day %}">次週</a>
+        </div>
     </div>
-    <div class="">
-      <table class="table table-bordered bg-light">
-        <thead class="thead-light">
-          <tr>
-            <th></th>
-            {% for day in days %} {% if day.weekday == 5 %}
-            <th scope="col" class="text-primary">{{ day | date:"d(D)" }}</th>
-            {% elif day.weekday == 6 %}
-            <th scope="col" class="text-danger">{{ day | date:"d(D)" }}</th>
-            {% else %}
-            <th scope="col">{{ day | date:"d(D)" }}</th>
-            {% endif %} {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
 
 
-
-          {% for hour, schedules in calendar.items %}
+<!-- 最初の行に日付を表示 -->
 <tr>
-    <td scope="row">{{ hour }}:00</td>
-    {% for datetime, book in schedules.items %}
-    <td>
-        {% if datetime <= today %}
-            -
-        {% elif book %}
-        <a href="{% url 'booking' store.id datetime|date:'Y' datetime|date:'m' datetime|date:'d' hour %}">
-          <i class="far fa-circle text-info"></i>
-        </a>
-
-        {% else %}
-            <i class="fas fa-times text-danger"></i>
-        {% endif %}
-    </td>
+    <td></td> <!-- 左上のセルは空白 -->
+    {% for dt in dates %}
+        <td>{{ dt }}</td>
     {% endfor %}
 </tr>
+
+<!-- 次の行から時間と予約状況を表示 -->
+{% for hour, schedules in calendar.items %}
+    <tr style="font-size:12px">
+        <td scope="row">
+            {{ hour }}:00
+        </td>
+        {% for dt, book in schedules.items %}
+            <td>
+                {% if dt <= today %}
+                    -
+                {% elif book %}
+                    <a href="">○</a>
+                {% else %}
+                    ×
+                {% endif %}
+            </td>
+        {% endfor %}
+    </tr>
 {% endfor %}
 
 
 
+    </tr>
 
 
+</table>
 
 
-         <!-- {% for hour, schedules in calendar.items %}
-          <tr>
-            <td scope="row">{{ hour }}:00</td>
-            {% for datetime, book in schedules.items %}
-            <td>
-              {% if datetime <= today %}
-                - 
-              {% elif book %}
-                <a href="">
-                  <i class="far fa-circle text-info"></i>
-                </a>
-              {% else %}
-                <i class="fas fa-times text-danger"></i>
-              {% endif %}
-              {% if book %}
-                <a href="{% url 'booking' store.id datetime|date:'Y' datetime|date:'m' datetime|date:'d' hour %}">
-                  <i class="far fa-circle text-info"></i>
-                </a>
-              {% else %}
-                <i class="fas fa-times text-danger"></i>
-              {% endif %}
-            </td>
-            {% endfor %}
-</tr>
-{% endfor %}-->
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!--
-          {% for hour, schedules in calendar.items %}
-          <tr>
-            <td scope="row">{{ hour }}:00</td>
-            {% for datetime, book in schedules.items %}
-            <td>
-              
-              {% if datetime <= today %} - {% elif book %}
-              <a href="">
-                <i class="far fa-circle text-info"></i>
-              </a>
-              {% else %}
-              <i class="fas fa-times text-danger"></i>
-              {% endif %}
-            </td>
-            {% endfor %}
-            {% if book %}
-            <a href="{% url 'booking' store.id datetime.year datetime.month datetime.day hour %}">
-              <i class="far fa-circle text-info"></i>
-            </a>
-          {% else %}
-            <i class="fas fa-times text-danger"></i>
-          {% endif %}
-          {% endfor %}
-        </tbody>
-      </table>
+            </tbody>
+        </table>
     </div>
-  </div>
-  
-  {% endblock %}-->
+    {% endblock %}
+
+
+
+    {% form.first_name class="form-control" placeholder="姓" %}
+    {% render_field form.last_name class="form-control" placeholder="名" %}
+    {% render_field form.tel class="form-control" placeholder="080-1234-5678" %}
+    {% render_field form.remarks class="form-control" %}
