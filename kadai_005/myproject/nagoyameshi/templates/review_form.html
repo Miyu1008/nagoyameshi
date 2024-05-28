@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+{% csrf_token %}
+{% if user.is_authenticated %}
+                <form class="login-form" action="" method="POST">
+                    {{ review_form.non_field_errors }}
+                    <div class="evaluation" style="float:left;">
+                        <input id="score1" type="radio" name="score" value="5" />
+                        <label for="score1"><span class="text">最高</span>★</label>
+                        <input id="score2" type="radio" name="score" value="4" />
+                        <label for="score2"><span class="text">良い</span>★</label>
+                        <input id="score3" type="radio" name="score" value="3" />
+                        <label for="score3"><span class="text">普通</span>★</label>
+                        <input id="score4" type="radio" name="score" value="2" />
+                        <label for="score4"><span class="text">悪い</span>★</label>
+                        <input id="score5" type="radio" name="score" value="1" />
+                        <label for="score5"><span class="text">最悪</span>★</label>
+                    </div>
+                    <br><br><br>
+                    <label for="comment">コメント:</label>
+                    <div class="form-group" type="text">{{ review_form.comment }}</div>
+                    
+                    {% csrf_token %}
+                    <br>
+                    <button type="submit" class="btn common-btn">投稿する</button>
+                    {% if form.errors %}
+                    <br>
+                    <p>エラー内容</p>
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <p>{{ error }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endif %} 
+                </form>
+            {% else %}
+                <p>レビューコメントを残すにはログインが必要です。</p>
+                <br>
+                <a class="btn common-btn" href="">新規登録</a>
+                <a class="btn common-btn-outline" href="{% url 'login' %}">ログイン</a>
+            {% endif %}
+        </div>
+    </div>
+    <!-- 口コミ情報を追加　ここまで -->    

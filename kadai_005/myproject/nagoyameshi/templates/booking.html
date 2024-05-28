@@ -4,17 +4,15 @@
 {% csrf_token %}
 <div class="card card-booking my-5 mx-auto">
   <div class="card-body">
-    <h5 class="card-title text-center">予約内容</h5>
     <table class="booking_table mb-4">
       <tbody>
         <tr>
           <td class="data">{{ store.name }}店</td>
-        </tr>
-        <tr>
-
           </td>
         </tr>
       </tbody>
+
+      
     </table>
     <h5 class="card-title text-center">予約情報</h5>
     <form method="post">
@@ -30,6 +28,7 @@
         </tbody>
       </table>
       <div class="button mx-auto">
+
         <button class="btn btn-lg btn-warning btn-block" type="submit">
           予約確定
         </button>
@@ -37,5 +36,6 @@
     </form>
   </div>
 </div>
+
 
 {% endblock %}

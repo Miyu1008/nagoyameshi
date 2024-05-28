@@ -94,20 +94,32 @@ class Schedule(models.Model):
         start = timezone.localtime(self.start).strftime('%Y/%m/%d %H:%M:%S')
         end = timezone.localtime(self.end).strftime('%Y/%m/%d %H:%M:%S')
         return f'{self.name} {start} ~ {end} {self.staff}'
-    
+
+
+
+
 class Product(models.Model):
     name = models.CharField(max_length=200)
     price = models.PositiveIntegerField()
+    description = models.TextField()
+    address = models.CharField(max_length=200, default='Tokyo, Japan', blank=True) 
+    phone_number = models.CharField(max_length=20, default='')
+    unavailable_dates = models.ManyToManyField('Date', blank=True, related_name='unavailable_product')
+    image = models.ImageField(upload_to='static/images/', default='static/images/default_image.png')
 
     def __str__(self):
         return self.name
      
     def get_absolute_url(self):
-        return reverse('list')
+        return reverse('store_list')
+
     
+
+
+
 class Booking(models.Model):
-    first_name = models.CharField('姓', max_length=100, null=True, blank=True)
-    last_name = models.CharField('名', max_length=100, null=True, blank=True)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     tel = models.CharField('電話番号', max_length=100, null=True, blank=True)
     remarks = models.TextField('備考', default="", blank=True)
     start = models.DateTimeField('開始時間', default=timezone.now)
@@ -118,7 +130,7 @@ class Booking(models.Model):
         end = timezone.localtime(self.end).strftime('%Y/%m/%d %H:%M')
         return f'{self.first_name}{self.last_name} {start} ~ {end} {self.staff}'
 
-# お気に入り
+# お気に入り 参考にする
 class Favorite(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
@@ -136,20 +148,18 @@ SCORE_CHOICES = [
 ]
 
 class Review(models.Model):
-    shop_id = models.CharField('店舗ID', max_length=10, blank=False)
-    shop_name = models.CharField('店舗名', max_length=200, blank=False)
-    image_url = models.CharField('画像１URL', max_length=300, blank=True)
-    user = models.ForeignKey(User, on_delete=models.PROTECT)
+    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     comment = models.TextField(verbose_name='レビューコメント', blank=False)
     score = models.PositiveSmallIntegerField(verbose_name='レビュースコア', choices=SCORE_CHOICES, default='3')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        unique_together = ('user', 'store') 
+        unique_together = ('user', 'store_id') 
 
     def __str__(self):
-        return str(self.shop_id)
+        return str(self.store_id)
 
     def get_percent(self):
         percent = round(self.score / 5 * 100)

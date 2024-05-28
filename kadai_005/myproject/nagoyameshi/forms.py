@@ -5,7 +5,7 @@ from django.contrib.auth.forms import UserCreationForm
 from nagoyameshi.models import CustomUser
 from .models import Store, StoreDayOff
 import datetime
-
+from .models import User, Review,  Product
 
 User = get_user_model()
 
@@ -24,19 +24,25 @@ class StoreForm(forms.ModelForm):
         model = Store
         fields = ['name', 'description', 'address', 'phone_number']
 
+class ProductCreationFrom(forms.Form):
+    class Meta:
+        model =  Product
+        fields = ['name', 'description', 'address', 'phone_number']
+
 
 
 class BookingForm(forms.Form):
     TIME_CHOICES = [(datetime.time(hour=i).strftime('%H:%M'), f'{i}:00') for i in range(24)]
-
     date = forms.DateField(widget=forms.SelectDateWidget())
     time = forms.ChoiceField(choices=TIME_CHOICES)
     first_name = forms.CharField(max_length=30, label='姓')
     last_name = forms.CharField(max_length=30, label='名')
     tel = forms.CharField(max_length=30, label='電話番号')
     remarks = forms.CharField(label='備考', widget=forms.Textarea())
+    store_id = forms.IntegerField(widget=forms.HiddenInput()) 
+
     
-    somedate = datetime.datetime(2021,1,1)
+    somedate = datetime.datetime(2024,1,1)
 
 
 
@@ -63,3 +69,8 @@ def activate_user(uidb64, token):
         return True
     
     return False
+
+class ReviewForm(forms.ModelForm):   
+    class Meta:
+        model = Review
+        fields = ['score', 'comment']

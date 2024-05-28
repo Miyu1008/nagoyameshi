@@ -4,12 +4,12 @@
 {% block content %}
 {% csrf_token %}
 <h1>店舗マイページ</h1>
-<a href="{% url 'new' %}">新規作成</a>
-<a href="{% url 'new' %}">店舗管理</a>
-<a href="{% url 'new' %}">レビュー管理</a>
-<a href="{% url 'new' %}">カテゴリ管理</a>
-<a href="{% url 'new' %}">会員情報</a>
-<a href="{% url 'new' %}">売上集計</a>
+<a href="{% url 'store_new' %}">新規作成</a>
+<a href="{% url 'top' %}">店舗管理</a>
+<a href="{% url 'top' %}">レビュー管理</a>
+<a href="{% url 'top' %}">カテゴリ管理</a>
+<a href="{% url 'top' %}">会員情報</a>
+<a href="{% url 'top' %}">売上集計</a>
 <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}

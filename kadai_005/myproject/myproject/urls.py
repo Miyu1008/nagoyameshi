@@ -37,20 +37,19 @@ urlpatterns = [
     path('store_dashboard/', views.store_dashboardview, name="store_dashboard"),
     path('store_list/', views.store_list, name='store_list'),
     path('store/<int:store_id>/', views.store_detail, name='store_detail'),
-    path('nagoyameshi/new/', views.ProductCreateView.as_view(), name="new"),
-    path('calendar/<int:store_id>/', views.CalendarView.as_view(), name='calendar_init'), 
-    path('calendar/<int:store_id>/<int:year>/<int:month>/<int:day>/', views.CalendarView.as_view(),name='calendar'),
+    path('store_new/', views.ProductCreateView.as_view(), name="store_new"),
     path('booking/<int:store_id>/', views.BookingView.as_view(), name='booking'),
+    path('booking/<int:store_id>/review/', views.ReviewView.as_view(), name='review'),
     path('favorite/<int:store_id>/', views.FavoriteView.as_view(), name='favorite'),
     path('favorite_list/', views.favorite_list, name="favorite_list"),
     path('toggle_favorite/<int:store_id>/', views.FavoriteView.as_view(), name='toggle_favorite'),
     path('create_store_day_off/', views.create_store_day_off, name='create_store_day_off'),
-    path('password_change/', views.PasswordChange.as_view(), name='password_change'), #追加
-    path('password_change_done/', views.PasswordChangeDone.as_view(), name='password_change_done'), #追加
+    path('password_change/', views.PasswordChange.as_view(), name='password_change'), 
+    path('password_change_done/', views.PasswordChangeDone.as_view(), name='password_change_done'), 
 
     path('', include('django.contrib.auth.urls')),
-    #path('activate/<uidb64>/<token>/', views.ActivateView.as_view(), name='activate'),
-    path('', include('subscription.urls')),    
+    path('subscription/', include('subscription.urls')), 
+   
     
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

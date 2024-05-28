@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic.edit import CreateView
 from .models import Store, Booking
 from .forms import CustomUserCreationForm  # CustomUserCreationFormのインポート
-from .forms import CustomAuthenticationForm
+from .forms import CustomAuthenticationForm,  ReviewForm
 from django.views.generic.edit import CreateView
 from .forms import StoreForm
 import datetime
@@ -18,15 +18,17 @@ from django.views.generic import View
 from .forms import BookingForm
 from .forms import AvailabilityForm
 from django.utils import timezone
-from .models import Store, Booking, Date
+from .models import Store, Booking, Date, reverse
 from .models import Favorite
 from django.contrib import messages
 from django.http import HttpResponse
-from .models import StoreDayOff
+from .models import StoreDayOff, Review
 from .forms import StoreDayOffForm
 from django.contrib.auth.views import PasswordChangeView, PasswordChangeDoneView
 from django.views.generic import TemplateView
-
+from django.http import HttpResponseBadRequest
+from django.db.models import Avg
+from .models import Product
 
 
 
@@ -115,85 +117,86 @@ def store_detail(request, store_id):
         form = StoreForm(instance=store)
     return render(request, 'store_detail.html', {'form': form, 'store': store})
 
-    
+
+
+def StoreInfo(request, store_id):
+    store = get_object_or_404(Store, pk=store_id)
+    id = store_id
+    query = get_gnavi_data(id, "", "", "", 1)
+    res_list = rest_search(query)
+    stores_info = extract_restaurant_info(res_list)
+    review_count = Review.objects.filter(shop_id=store_id).count()
+    score_ave = Review.objects.filter(shop_id = store_id).aggregate(Avg('score'))
+    average = score_ave['score__avg']
+    if average:
+        average_rate = average / 5 * 100
+    else:
+        average_rate = 0
+
+    if request.method == 'GET':        
+        review_form = ReviewForm()
+        review_list = Review.objects.filter(shop_id = store_id)
+
+    else:
+        form = ReviewForm(data=request.POST)
+        score = request.POST['score']
+        comment = request.POST['comment']
+
+        if form.is_valid():
+            review = Review()
+            review.store_id = store_id
+            review.store_name = stores_info[0][1]
+            review.store_address = stores_info[0][7]
+            review.image_url = stores_info[0][5]
+            review.user = request.user
+            review.score = score
+            review.comment = comment
+            review.save()
+            return redirect('techapp:store_info', store_id)
+
+    params = {
+        'title': '店舗詳細',
+        'review_count': review_count,
+        'stores_info': stores_info,
+        'review_form': review_form,
+        'review_list': review_list,
+        'average': average,
+        'average_rate': average_rate,
+    }
+    return render(request, 'store_detail.html', params)
+
+#レビュー　booking、favorite参考に
+class ReviewView(View):
+
+    def post(self, request, *args, **kwargs):
+        form = ReviewForm(request.POST)
+
+        if form.is_valid():
+            store_id = form.cleaned_data['store_id']
+            store = Store.objects.get(id=store_id)
+            
+            review = Review()
+            review.store = store
+            review.rating = form.cleaned_data['rating']
+            review.comment = form.cleaned_data['comment']
+            review.user = request.user
+            review.save()
+            
+            # レビューが保存された後
+            return redirect(reverse('store_detail', kwargs={'store_id': store_id}))
+        
+        # フォームが有効でない
+        return render(request, 'store_detail.html', {'form': form, 'store_id': store_id})
+
 
 
 #店舗情報編集
 class ProductCreateView(CreateView):
-     model = Store
+     model = Product
      fields = '__all__'
+     template_name = 'store_new.html' 
+     
 
-def store_edit(request, pk):
-    store = get_object_or_404(Store, pk=pk)
-    if request.method == "POST":
-        form = StoreForm(request.POST, instance=store)
-        if form.is_valid():
-            store = form.save(commit=False)
-            store.save()
-            return redirect('store_detail', pk=store.pk)
-    else:
-        form = StoreForm(instance=store)
-    return render(request, 'nagoyameshi/store_dashboard.html', {'form': form})
-
-
-
-#カレンダー
-class CalendarView(View):
-    def get(self, request, store_id, *args, **kwargs):
-        store = Store.objects.get(pk=store_id)
-        today = datetime.date.today()
-        year = kwargs.get('year')
-        month = kwargs.get('month')
-        day = kwargs.get('day')
-        if year and month and day:
-            start_date = datetime.date(year=int(year), month=int(month), day=int(day))
-        else:
-            start_date = today
-        days = [start_date + datetime.timedelta(days=day) for day in range(7)]
-        start_day = days[0]
-        end_day = days[-1]
-
-        #ここを直す
-        calendar = {}
-        for day in days:
-            row = {}
-            for hour in range(9, 27):
-                row[hour] = True
-            calendar[day] = row
-
-        #直す
-
-        unavailable_dates = store.unavailable_dates.all()
-        unavailable_dates_list = [unavailable_date.date for unavailable_date in unavailable_dates]
-        #直す　1週間分だけ取得できるようにする
-        for hour in calendar: 
-            for date in calendar[hour]:
-                if date not in unavailable_dates_list:
-                   calendar[hour][date] = True
-
-
-        start_time = datetime.datetime.now()
-        end_time = start_time + datetime.timedelta(hours=1)  # 予約時間が1時間と仮定
-
-        booking_data = Booking.objects.exclude(Q(start__gt=end_time) | Q(end__lt=start_time))
-        for booking in booking_data:
-            local_time = timezone.localtime(booking.start)
-            booking_date = local_time.date()
-            booking_hour = local_time.hour
-            if (booking_hour in calendar) and (booking_date in calendar[booking_hour]):
-                calendar[booking_hour][booking_date] = False
-        print(calendar)
-        return render(request, 'calendar.html', {
-            'calendar': calendar,
-            'days': days,
-            'start_day': start_day,
-            'end_day': end_day,
-            'before': days[0] - datetime.timedelta(days=7),
-            'next': days[-1] + datetime.timedelta(days=1),
-            'today': today,
-            'store': store,
-            #'date': date,  # date変数を追加
-        })
 
 #お気に入り
 class FavoriteView(View):
@@ -222,81 +225,67 @@ def favorite_list(request):
         print(favorites[0].user)
     return render(request, 'favorite_list.html', {'favorites': favorites})
 
-    
+
 #予約
-class BookingView(View):
+class BookingView(View,LoginRequiredMixin):
     def get(self, request, *args, **kwargs):
         year = self.kwargs.get('year')
         month = self.kwargs.get('month')
         day = self.kwargs.get('day')
-        hour = self.kwargs.get('hour')
-        form = BookingForm(request.POST or None)
-
+        time = self.kwargs.get('time')
+        store_id = self.kwargs.get('store_id')
+        
+        form = BookingForm(initial={'store_id': store_id})
+        
         return render(request, 'booking.html', {
             'year': year,
             'month': month,
             'day': day,
-            'hour': hour,
+            'time': time,
             'form': form,
         })
 
     def post(self, request, *args, **kwargs):
-        year = self.kwargs.get('year')
-        month = self.kwargs.get('month')
-        day = self.kwargs.get('day')
-        hour = self.kwargs.get('hour')
-        start_time = make_aware(datetime.datetime(year=year, month=month, day=day, hour=hour))
-        end_time = make_aware(datetime.datetime(year=year, month=month, day=day, hour=hour + 1))
+        year = int(request.POST['date_year'])
+        month = int(request.POST['date_month'])
+        day = int(request.POST['date_day'])
+        time = request.POST['time']
+        
+        hour, minute = map(int, time.split(':'))
+        start_time = make_aware(datetime.datetime(year=year, month=month, day=day, hour=hour, minute=minute))
+        end_time = start_time + datetime.timedelta(hours=1)
         booking_data = Booking.objects.filter(start=start_time)
-        form = BookingForm(request.POST or None)
-        if booking_data.exists():
-            form.add_error(None, '既に予約があります。\n別の日時で予約をお願いします。')
-        else:
-            if form.is_valid():
+        
+        form = BookingForm(request.POST)
+        
+        if form.is_valid():
+            store_id = form.cleaned_data['store_id']
+            store = Store.objects.get(id=store_id)
+            
+            if booking_data.exists():
+                form.add_error(None, '既に予約があります。\n別の日時で予約をお願いします。')
+            else:
                 booking = Booking()
                 booking.start = start_time
                 booking.end = end_time
-                booking.first_name = form.cleaned_data['first_name']
-                booking.last_name = form.cleaned_data['last_name']
+                
                 booking.tel = form.cleaned_data['tel']
                 booking.remarks = form.cleaned_data['remarks']
+                booking.store = store
+                booking.user = request.user
                 booking.save()
-                return redirect('store') # あとで変更
-
+                
+                return redirect(reverse('booking', kwargs={'store_id': store_id}))
+        
         return render(request, 'booking.html', {
             'year': year,
             'month': month,
             'day': day,
-            'hour': hour,
+            'time': time,
             'form': form,
         })
-    
 
 
-def make_reservation(request):
-    if request.method == 'POST':
-        # 予約の処理を行う
-        # 予約の詳細はリクエストから取得し、データベースに保存する
-
-        # 予約日
-        reservation_date = request.POST.get('reservation_date')
-
-        # 店舗
-        store_id = request.POST.get('store_id')
-        store = Store.objects.get(pk=store_id)
-
-        # 予約日が定休日かどうかをチェック
-        if StoreDayOff.objects.filter(store=store, day_off__date=reservation_date).exists():
-            return HttpResponse("Sorry, the shop is closed on this day.")
-        else:
-            # 予約を保存するなどの適切な処理を行う
-            return HttpResponse("Reservation made successfully!")
-
-    else:
-        # GETリクエストの場合、予約フォームを表示する
-        stores = Store.objects.all()
-        return render(request, 'reservation_form.html', {'stores': stores})
-    
     
 def create_store_day_off(request):
     if request.method == 'POST':
