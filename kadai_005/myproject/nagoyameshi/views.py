@@ -187,7 +187,7 @@ class ReviewView(View):
             existing_review = Review.objects.filter(store=store, user=request.user).first()
             if existing_review:
                 # レビューが既に存在する場合は、更新処理を行う
-                existing_review.rating = form.cleaned_data['rating']
+                existing_review.score = form.cleaned_data['score']
                 existing_review.comment = form.cleaned_data['comment']
                 existing_review.save()
                 messages.success(request, "レビューを更新しました。")
@@ -195,7 +195,7 @@ class ReviewView(View):
                 # 新しいレビューを作成
                 review = Review()
                 review.store = store
-                review.rating = form.cleaned_data['rating']
+                review.score = form.cleaned_data['score']
                 review.comment = form.cleaned_data['comment']
                 review.user = request.user
                 review.save()

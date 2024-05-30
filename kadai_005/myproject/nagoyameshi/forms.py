@@ -73,4 +73,4 @@ def activate_user(uidb64, token):
 class ReviewForm(forms.ModelForm):   
     class Meta:
         model = Review
-        fields = ['score', 'comment']
+        fields = ['score', 'comment','store','user']
