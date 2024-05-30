@@ -169,14 +169,14 @@ def StoreInfo(request, store_id):
 #データが登録できるように修正する
 class ReviewView(View):
     def post(self, request, store_id):
-        
-        form = ReviewForm()
-        form.comment = request.POST.get('comment')
-        form.score = request.POST.get('score')
         store = Store.objects.get(id=store_id)
-        form.store = store
-        form.user = request.user
-
+        form_data = {
+            'comment': request.POST.get('comment'),
+            'score': request.POST.get('score'),
+            'store': store,
+            'user': request.user
+        }
+        form = ReviewForm(form_data)
 
         if form.is_valid():
             print("あいうえお")
