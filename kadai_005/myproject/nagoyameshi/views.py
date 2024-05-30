@@ -163,31 +163,55 @@ def StoreInfo(request, store_id):
         'average': average,
         'average_rate': average_rate,
     }
-    return render(request, 'store_detail.html', params)
+    return render(request, 'store_detail', params)
 
 #レビュー　booking、favorite参考に
+#データが登録できるように修正する
 class ReviewView(View):
+    def post(self, request, store_id):
+        
+        form = ReviewForm()
+        form.comment = request.POST.get('comment')
+        form.score = request.POST.get('score')
+        store = Store.objects.get(id=store_id)
+        form.store = store
+        form.user = request.user
 
-    def post(self, request, *args, **kwargs):
-        form = ReviewForm(request.POST)
 
         if form.is_valid():
+            print("あいうえお")
             store_id = form.cleaned_data['store_id']
             store = Store.objects.get(id=store_id)
             
-            review = Review()
-            review.store = store
-            review.rating = form.cleaned_data['rating']
-            review.comment = form.cleaned_data['comment']
-            review.user = request.user
-            review.save()
+            # レビューが既に存在するか確認
+            existing_review = Review.objects.filter(store=store, user=request.user).first()
+            if existing_review:
+                # レビューが既に存在する場合は、更新処理を行う
+                existing_review.rating = form.cleaned_data['rating']
+                existing_review.comment = form.cleaned_data['comment']
+                existing_review.save()
+                messages.success(request, "レビューを更新しました。")
+            else:
+                # 新しいレビューを作成
+                review = Review()
+                review.store = store
+                review.rating = form.cleaned_data['rating']
+                review.comment = form.cleaned_data['comment']
+                review.user = request.user
+                review.save()
+                messages.success(request, "レビューを追加しました。")
             
-            # レビューが保存された後
-            return redirect(reverse('store_detail', kwargs={'store_id': store_id}))
-        
-        # フォームが有効でない
-        return render(request, 'store_detail.html', {'form': form, 'store_id': store_id})
-
+            # レビューが保存または更新された後、店舗詳細ページにリダイレクト
+            return render(request, 'store_detail.html', {'store': store})
+        else:
+            print(form.errors)
+        # フォームが有効でない場合、store_idがNoneであればエラーメッセージを表示
+        if store_id is None:
+            messages.error(request, "店舗IDが不明です。")
+            return redirect('store_detail')  # 適切なエラーページにリダイレクト
+        # フォームが有効でない場合、エラーメッセージを含むフォームと共にテンプレートを再表示
+        messages.error(request, "レビューの追加に失敗しました。")
+        return render(request, 'store_detail.html', {'form': form, 'store': store})
 
 
 #店舗情報編集
